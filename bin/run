@@ -2,8 +2,10 @@
 
 set -e
 
-echo "Compiling before pass..."
-clang -O3 -lrt -lc -lstdc++ -lm -o build/before_pass $@
+CFLAGS="-O3 -lrt -lc -lstdc++ -lm"
+
+echo "Compiling baseline..."
+clang ${CFLAGS} -o build/baseline $@
 
 clang -emit-llvm -c -o tests/in.bc $@
 
@@ -13,5 +15,5 @@ llvm-dis tests/out.bc -o tests/out.ll
 
 # cat tests/out.ll
 
-echo "Compiling after pass..."
-clang -O3 -lrt -lc -lstdc++ -lm tests/out.bc rt/rt.c -o build/after_pass
+echo "Compiling with pass..."
+clang ${CFLAGS} tests/out.bc rt/rt.c -o build/modified
