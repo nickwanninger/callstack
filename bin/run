@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+echo "Compiling before pass..."
+clang -O3 -lrt -lc -lstdc++ -lm -o build/before_pass $@
+
+clang -emit-llvm -c -o tests/in.bc $@
+
+opt -load build/CallStack.so -CallStack -o tests/out.bc tests/in.bc
+
+llvm-dis tests/out.bc -o tests/out.ll
+
+# cat tests/out.ll
+
+echo "Compiling after pass..."
+clang -O3 -lrt -lc -lstdc++ -lm tests/out.bc rt/rt.c -o build/after_pass
